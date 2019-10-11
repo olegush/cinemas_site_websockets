@@ -1,11 +1,7 @@
-import random
 import json
-import time
 
-import asks
 import trio
 from trio_websocket import serve_websocket, ConnectionClosed
-import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from werkzeug.contrib.cache import FileSystemCache
@@ -53,14 +49,18 @@ async def handle_server(request):
     payload_afisha = {'view': 'list'}
     content_afisha = await get_content(URL_AFISHA, payload_afisha, CACHE_AFISHA)
     movies = parse_afisha_page(content_afisha)
-    async with trio.open_nursery() as nursery:
-        for movie in movies:
-            await trio.sleep(0.5)
-            nursery.start_soon(handle_movie, ws, movie)
+    try:
+        async with trio.open_nursery() as nursery:
+            for movie in movies:
+                await trio.sleep(0.5)
+                nursery.start_soon(handle_movie, ws, movie)
+    except ConnectionClosed as cc:
+        print('Closed: {}/{} {}'.format(cc.reason.code, cc.reason.name, reason))
     await ws.send_message('completed')
 
 
 async def main():
     await serve_websocket(handle_server, '127.0.0.1', 8080, ssl_context=None)
+
 
 trio.run(main)
