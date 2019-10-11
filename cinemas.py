@@ -9,6 +9,7 @@ from werkzeug.contrib.cache import FileSystemCache
 
 
 TIMEOUT = 30
+LIMITS = 3
 
 
 async def get_content(url, params, cache):
@@ -21,7 +22,7 @@ async def get_content(url, params, cache):
     if cache_content is not None:
         return cache_content
     headers = {'user-agent': UserAgent().chrome}
-    resp = await asks.get(url, params=params, headers=headers, timeout=TIMEOUT)
+    resp = await asks.get(url, params=params, headers=headers, timeout=TIMEOUT, retries=LIMITS)
     resp.raise_for_status()
     content = resp.text
     c.set(cache_id, content)
