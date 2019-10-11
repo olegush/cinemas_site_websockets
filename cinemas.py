@@ -1,8 +1,6 @@
 import re
 
-import trio
 import asks
-import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from werkzeug.contrib.cache import FileSystemCache

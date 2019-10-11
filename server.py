@@ -3,9 +3,6 @@ import json
 import trio
 from trio_websocket import serve_websocket, ConnectionClosed, ConnectionRejected
 from asks.errors import BadStatus, RequestTimeout
-from bs4 import BeautifulSoup
-from fake_useragent import UserAgent
-from werkzeug.contrib.cache import FileSystemCache
 
 from cinemas import get_content, parse_afisha_page, parse_kinopoisk_page, parse_imdb_page
 

@@ -1,0 +1,6 @@
+trio==0.12.1
+trio-websocket==0.8.0
+asks==2.3.6
+beautifulsoup4==4.7.1
+fake-useragent==0.1.11
+Werkzeug==0.15.5
