@@ -8,6 +8,9 @@ from fake_useragent import UserAgent
 from werkzeug.contrib.cache import FileSystemCache
 
 
+TIMEOUT = 30
+
+
 async def get_content(url, params, cache):
     c = FileSystemCache(
         'cache',
@@ -18,7 +21,7 @@ async def get_content(url, params, cache):
     if cache_content is not None:
         return cache_content
     headers = {'user-agent': UserAgent().chrome}
-    resp = await asks.get(url, params=params, headers=headers)
+    resp = await asks.get(url, params=params, headers=headers, timeout=TIMEOUT)
     resp.raise_for_status()
     content = resp.text
     c.set(cache_id, content)
@@ -27,8 +30,6 @@ async def get_content(url, params, cache):
 
 def parse_afisha_page(content):
     soup = BeautifulSoup(content, 'html.parser')
-    with open('temp.html', 'w') as f:
-        f.write(str(soup))
     movies = []
     for movie in soup.find_all('div', class_='new-list__item movie-item'):
         title = movie.find('a', class_='new-list__item-link').text

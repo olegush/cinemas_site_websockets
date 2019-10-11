@@ -1,7 +1,9 @@
+from enum import Enum
 import json
 
 import trio
 from trio_websocket import serve_websocket, ConnectionClosed
+from asks.errors import BadStatus, RequestTimeout
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from werkzeug.contrib.cache import FileSystemCache
@@ -16,6 +18,13 @@ CACHE_KP = {'threshold': 100, 'default_timeout': 60*60*24}
 URL_IMDB = 'https://www.imdb.com/search/title/'
 CACHE_IMDB = {'threshold': 100, 'default_timeout': 60*60*24}
 MOVIES_COUNT = 24
+
+
+class ProcessingStatus(Enum):
+    OK = 'OK'
+    CONN_ERROR = 'CONN_ERROR'
+    BAD_STATUS = 'BAD_STATUS'
+    TIMEOUT = 'TIMEOUT'
 
 
 def films_list():
@@ -55,7 +64,12 @@ async def handle_server(request):
                 await trio.sleep(0.5)
                 nursery.start_soon(handle_movie, ws, movie)
     except ConnectionClosed as cc:
-        print('Closed: {}/{} {}'.format(cc.reason.code, cc.reason.name, reason))
+        status = ProcessingStatus.CONN_ERROR.name
+    except BadStatus:
+        status = ProcessingStatus.BAD_STATUS.name
+    except RequestTimeout:
+        status = ProcessingStatus.TIMEOUT.name
+
     await ws.send_message('completed')
 
 
