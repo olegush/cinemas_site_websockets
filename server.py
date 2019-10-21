@@ -42,7 +42,7 @@ async def handle_movie(ws, movie):
 
 
 async def handle_server(request):
-    """Trio nusery for handler-functions."""
+    """Trio nursery for handler-functions."""
     movies = []
     ws = await request.accept()
     payload_afisha = {'view': 'list'}
