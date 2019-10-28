@@ -30,3 +30,5 @@ $ python server.py
 ```
 
 2. Open index.html
+
+![afkp screenshot](screenshots/afkp.png)
