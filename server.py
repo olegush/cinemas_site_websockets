@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 
 import trio
@@ -9,31 +10,32 @@ from cinemas import get_content, parse_afisha_page, parse_kinopoisk_page, parse_
 
 SERVER = '127.0.0.1'
 PORT = 8080
-URL_AFISHA = 'https://www.afisha.ru/spb/schedule_cinema/'
+URL_AFISHA = 'https://spb.kinoafisha.info/movies/'
 CACHE_AFISHA = {'threshold': 1, 'default_timeout': 60*60*1}
 URL_KP = 'https://www.kinopoisk.ru/index.php'
 CACHE_KP = {'threshold': 100, 'default_timeout': 60*60*24}
 URL_IMDB = 'https://www.imdb.com/search/title/'
 CACHE_IMDB = {'threshold': 100, 'default_timeout': 60*60*24}
 MOVIES_COUNT = 24
-DELAY = 0.5
+DELAY = 0.1
 
 
 async def handle_movie(ws, movie):
     """Handler-function sends fetch and parsing results to socket."""
-    payload_kp = {'kp_query': '{0} {1}'.format(movie['title'], movie['year'])}
+    year = int(movie['year'])
+    payload_kp = {'kp_query': '{0} {1}'.format(movie['title'], year)}
     content_kp = await get_content(URL_KP, payload_kp, CACHE_KP)
-    kp_movie = parse_kinopoisk_page(content_kp, movie['year'])
+    kp_movie = parse_kinopoisk_page(content_kp, year)
     if kp_movie['id_kinopoisk']:
         if kp_movie['title_eng'] == '':
             kp_movie['imdb'] = ''
             kp_movie['rating_imdb'] = 0
         else:
-            year = movie['year']
+            year = int(movie['year'])
             payload_imdb = {
                 'title': kp_movie['title_eng'],
                 'title_type': 'feature',
-                'release_date': f'{year},{year}',
+                'release_date': f'{year-1},{year+1}',
                 }
             content_imdb = await get_content(URL_IMDB, payload_imdb, CACHE_IMDB)
             kp_movie.update(parse_imdb_page(content_imdb, movie['year']))
@@ -45,7 +47,8 @@ async def handle_server(request):
     """Trio nursery for handler-functions."""
     movies = []
     ws = await request.accept()
-    payload_afisha = {'view': 'list'}
+    today = datetime.today().strftime('%Y%m%d')
+    payload_afisha = {'order': 'popular', 'date': today}
     content_afisha = await get_content(URL_AFISHA, payload_afisha, CACHE_AFISHA)
     movies = parse_afisha_page(content_afisha)
     try:

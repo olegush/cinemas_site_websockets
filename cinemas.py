@@ -10,20 +10,20 @@ TIMEOUT = 30
 LIMITS = 3
 
 
-async def get_content(url, params, cache):
+async def get_content(url, payload, cache):
     """Fetch content from url or get it from cache."""
     cache = FileSystemCache(
         'cache',
         threshold=cache['threshold'],
         default_timeout=cache['default_timeout'],
         )
-    cache_id = url + str(params)
+    cache_id = url + str(payload)
     cache_content = cache.get(cache_id)
     if cache_content is not None:
         return cache_content
     headers = {'user-agent': UserAgent().chrome}
     resp = await asks.get(
-        url, params=params, headers=headers, timeout=TIMEOUT, retries=LIMITS,
+        url, params=payload, headers=headers, timeout=TIMEOUT, retries=LIMITS,
         )
     resp.raise_for_status()
     content = resp.text
@@ -35,20 +35,16 @@ def parse_afisha_page(html):
     """Afisha schedule page parser."""
     soup = BeautifulSoup(html, 'html.parser')
     movies = []
-    for movie in soup.find_all('div', class_='new-list__item movie-item'):
-        title = movie.find('a', class_='new-list__item-link').text
-        year = int(movie.find('div', class_='new-list__item-status').text[:4])
-        href = movie.find('a', class_='new-list__item-link')['href']
-        id_afisha = re.search('\d+', href).group(0)
-        descr = ''
-        descr_tag = movie.find('div', class_='new-list__item-verdict')
-        if descr_tag:
-            descr = descr_tag.string
-        movies.append({
-            'title': title,
-            'year': year,
-            'id_afisha': id_afisha,
-            'descr': descr},
+
+    for movie in soup.find_all('article', class_='films_item fav fav-film grid_cell3'):
+        title = movie.find('span', class_='link_border').text
+        descr_tag = movie.find('span', class_='films_info')
+        genre = descr_tag.text
+        year, country = descr_tag.next_element.next_element.next_element.text.split(',')#re.search(r'[\d+]{4}', descr).group(0)
+        href = movie.find('a', class_='films_iconFrame')['href']
+        id_afisha = re.search(r'\d+', href).group(0)
+        movies.append(
+            {'title': title, 'year': year, 'id_afisha': id_afisha, 'descr': f'{genre}, {country}'},
             )
     return movies
 

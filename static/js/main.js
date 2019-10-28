@@ -52,7 +52,7 @@ function insertMovie(movie) {
   } else {
     kp_link = ''
   }
-  var html = '<div class="col-md-4"><div class="card mb-4 box-shadow"><img class="card-img-top" src="https://st.kp.yandex.net/images/film_iphone/iphone360_' + movie.id_kinopoisk + '.jpg" alt="' + movie.title + ', ' + movie.year + '" title="' + movie.title + ', ' + movie.year + '">                      <div class="card-body">                        <p class="card-text"><h4>' + movie.title + '</h4><h6>' + movie.title_eng + '</h6><p></p><p>' + movie.year + '<p><p>'+ movie.runtime + '</p><p>' + movie.descr + '</p><div class="d-flex justify-content-between align-items-center"><div class="btn-group"><a href="https://www.afisha.ru/movie/' + movie.id_afisha + '" class="btn btn-sm btn-outline-secondary">Афиша</a>' + kp_link + imdb_link + '</div></div></div></div></div>'
+  var html = '<div class="col-md-4"><div class="card mb-4 box-shadow"><img class="card-img-top" src="https://st.kp.yandex.net/images/film_iphone/iphone360_' + movie.id_kinopoisk + '.jpg" alt="' + movie.title + ', ' + movie.year + '" title="' + movie.title + ', ' + movie.year + '">                      <div class="card-body">                        <p class="card-text"><h4>' + movie.title + '</h4><h6>' + movie.title_eng + '</h6><p></p><p>' + movie.year + '<p><p>'+ movie.runtime + '</p><p>' + movie.descr + '</p><div class="d-flex justify-content-between align-items-center"><div class="btn-group"><a href="https://www.kinoafisha.info/movies/' + movie.id_afisha + '" class="btn btn-sm btn-outline-secondary">КА</a>' + kp_link + imdb_link + '</div></div></div></div></div>'
   $(html).appendTo('#mainrow').show('slow');
 }
 
