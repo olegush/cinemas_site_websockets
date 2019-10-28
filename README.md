@@ -21,7 +21,7 @@ python3 tests.py
 
 # Quickstart
 
-1. Run **server.py**.
+1. Run server:
 
 ```bash
 
@@ -29,6 +29,14 @@ $ python server.py
 
 ```
 
-2. Open index.html
+1. Run client:
+
+```bash
+
+$ python app.py
+
+```
+
+3. Goto http://0.0.0.0:5000/
 
 ![afkp screenshot](screenshots/afkp.png)
