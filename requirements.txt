@@ -1,3 +1,5 @@
+python-dotenv==0.10.1
+flask==1.0.3
 trio==0.12.1
 trio-websocket==0.8.0
 asks==2.3.6
